@@ -1,6 +1,5 @@
 from modules import seq_operations, fastq_operations
 
-
 def run_dna_rna_tools(*args):
     """
     Perform DNA/RNA sequence operations
@@ -40,7 +39,7 @@ def run_dna_rna_tools(*args):
 
 def filter_fastq(
     input_fastq: str,
-    output_fastq: str = None,
+    output_fastq: str,
     gc_bounds: tuple[float, float] | float = (0, 100),
     length_bounds: tuple[int, int] | int = (0, 2**32),
     quality_threshold: float = 0,
@@ -61,8 +60,8 @@ def filter_fastq(
     sequences = fastq_operations.read_fastq(input_fastq)
 
     result = {}
-    for name in seqs:
-        sequence_data = seqs[name]
+    for name in sequences:
+        sequence_data = sequences[name]
         sequence = sequence_data[0]
         quality = sequence_data[1]
 
