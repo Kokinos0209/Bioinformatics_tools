@@ -1,5 +1,6 @@
 # Bioinformatics tools
 
+
 A set of utilities for working with DNA/RNA sequences and FASTQ files.
 
 ## Functionality
@@ -35,15 +36,27 @@ Filters FASTQ sequences by various criteria.
 
 **Parameters:**
 
-- `seqs - dictionary {sequence_name: (sequence, quality)}`
+- `input_fastq - path to input FASTQ file`
+- `output_fastq - path for output FASTQ file (saved in 'filtered' folder)`
 - `gc_bounds - GC content bounds (default: (0, 100))`
 - `length_bounds - length bounds (default: (0, 2³²))`
 - `quality_threshold - average quality threshold (default: 0)`
 
+**Usage Examples:**
+```Python
+filter_fastq(
+    input_fastq="example_fastq.fastq",
+    output_fastq="high_quality.fastq",
+    quality_threshold=20,
+    gc_bounds=(40, 60)
+)
+```
+
 ## Installation and Usage
 
 ~~~
-Вот тут у меня еще нет понимания как устанавливать с репозитория пакеты
+git clone git@github.com:Kokinos0209/Bioinformatics_tools.git
+cd pybio-tools
 ~~~
 
 **Import functions**

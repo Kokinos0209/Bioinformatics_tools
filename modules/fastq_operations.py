@@ -1,6 +1,15 @@
 import os
 
 def read_fastq(input_file):
+    """
+    Read FASTQ file and return sequences dictionary.
+    
+    Args:
+        input_file: Path to FASTQ file
+        
+    Returns:
+        Dictionary with sequence names as keys and (sequence, quality) as values
+    """
     sequences = {}
     with open(input_file, 'r') as file:
         lines = file.readlines()
@@ -17,6 +26,13 @@ def read_fastq(input_file):
     return sequences
 
 def write_fastq(sequences_dict, output_file):
+    """
+    Write sequences to FASTQ file in filtered folder.
+    
+    Args:
+        sequences_dict: Dictionary with sequence data
+        output_file: Output filename (saved in filtered folder)
+    """
     folder = "filtered"
     if not os.path.exists(folder):
         os.makedirs(folder)
