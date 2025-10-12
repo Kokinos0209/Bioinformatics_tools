@@ -1,6 +1,6 @@
 from modules import seq_operations, fastq_operations
 
-def run_dna_rna_tools(*args):
+def run_dna_rna_tools(*args: str) -> any:
     """
     Perform DNA/RNA sequence operations
 
