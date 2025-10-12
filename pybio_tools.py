@@ -32,8 +32,10 @@ def run_dna_rna_tools(*args):
                     results.append(seq_operations.complement(seq))
                 elif operation == "reverse_complement":
                     results.append(seq_operations.reverse_complement(seq))
-
-    return results
+    if len(results) == 1:
+        return results[0]
+    else:
+        return results
 
 
 def filter_fastq(
