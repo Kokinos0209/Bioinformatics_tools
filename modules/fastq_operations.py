@@ -1,4 +1,4 @@
-def gc_content(seq: str) -> float:
+def check_gc_content(seq: str) -> float:
     """
     Calculate GC content percentage of a sequence.
 
@@ -8,12 +8,13 @@ def gc_content(seq: str) -> float:
     Returns:
         GC content as percentage (0-100)
     """
-    gc_count = seq.count("G") + seq.count("C")
-    total_length = len(seq)
+    seq_upper = seq.upper()
+    gc_count = seq_upper.count("G") + seq_upper.count("C")
+    total_length = len(seq_upper)
     return (gc_count / total_length) * 100
 
 
-def check_bounds(lenght: int, bounds: int | tuple[float, float]) -> bool:
+def check_bounds(value: int, bounds: int | tuple[float, float]) -> bool:
     """
     Check if value is within specified bounds.
 
@@ -25,17 +26,11 @@ def check_bounds(lenght: int, bounds: int | tuple[float, float]) -> bool:
         True if value is within bounds, False otherwise
     """
     if type(bounds) == int:
-        if lenght < bounds:
-            return True
-        else:
-            return False
+         return value < bounds
     else:
-        min_lenght = bounds[0]
-        max_lenght = bounds[1]
-        if min_lenght <= lenght <= max_lenght:
-            return True
-        else:
-            return False
+        min_value = bounds[0]
+        max_value = bounds[1]
+        return min_value <= value <= max_value
 
 
 def average_quality(q_string: str) -> float:

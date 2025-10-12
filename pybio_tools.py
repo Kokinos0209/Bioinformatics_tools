@@ -60,7 +60,7 @@ def filter_fastq(
         sequence = sequence_data[0]
         quality = sequence_data[1]
 
-        gc_percent = fastq_operations.gc_content(sequence)
+        gc_percent = fastq_operations.check_gc_content(sequence)
         gc_opt = fastq_operations.check_bounds(gc_percent, gc_bounds)
         if not gc_opt:
             continue
@@ -77,3 +77,4 @@ def filter_fastq(
         result[name] = (sequence, quality)
 
     return result
+
