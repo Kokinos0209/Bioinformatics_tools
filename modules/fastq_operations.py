@@ -17,14 +17,12 @@ def read_fastq(input_file):
     return sequences
 
 def write_fastq(sequences_dict, output_file):
-    folder = os.path.dirname(output_file)
-    if folder and not os.path.exists(folder):
+    folder = "filtered"
+    if not os.path.exists(folder):
         os.makedirs(folder)
-        
-    if os.path.exists(output_file):
-        raise FileExistsError(f"File {output_file} already exists. Will not overwrite)))")
+    full_path = os.path.join(folder, output_file)
     
-    with open(output_file, 'w') as file:
+    with open(full_path, 'w') as file:
         for name, (sequence, quality) in sequences_dict.items():
             file.write(f"@{name}\n")
             file.write(f"{sequence}\n")
