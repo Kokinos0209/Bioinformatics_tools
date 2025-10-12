@@ -22,7 +22,7 @@ def write_fastq(sequences_dict, output_file):
         os.makedirs(folder)
         
     if os.path.exists(output_file):
-        raise FileExistsError(f"File {output_file} already exists. Will not overwrite.")
+        raise FileExistsError(f"File {output_file} already exists. Will not overwrite)))")
     
     with open(output_file, 'w') as file:
         for name, (sequence, quality) in sequences_dict.items():

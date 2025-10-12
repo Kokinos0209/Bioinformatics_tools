@@ -39,7 +39,8 @@ def run_dna_rna_tools(*args):
 
 
 def filter_fastq(
-    seqs: dict[str, tuple[str, str]],
+    input_fastq: str,
+    output_fastq: str = None,
     gc_bounds: tuple[float, float] | float = (0, 100),
     length_bounds: tuple[int, int] | int = (0, 2**32),
     quality_threshold: float = 0,
@@ -48,7 +49,8 @@ def filter_fastq(
     Filters FASTQ sequences by GC content, length, and quality
 
     Args:
-    seqs (dict): A dictionary {sequence_name: (sequence, quality)}
+    input_fastq (str): Path to input FASTQ file
+    output_fastq (str): Path to output FASTQ file 
     gc_bounds: GC content bounds (default (0, 100))
     length_bounds: Length bounds (default (0, 2**32))
     quality_threshold: Average quality threshold (default 0)
@@ -56,6 +58,8 @@ def filter_fastq(
     Returns:
     dict: Filtered dictionary of sequences
     """
+    sequences = fastq_operations.read_fastq(input_fastq)
+
     result = {}
     for name in seqs:
         sequence_data = seqs[name]
@@ -77,6 +81,8 @@ def filter_fastq(
             continue
 
         result[name] = (sequence, quality)
+
+    fastq_operations.write_fastq(result, output_fastq)
 
     return result
 
