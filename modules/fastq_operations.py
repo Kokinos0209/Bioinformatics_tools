@@ -1,3 +1,36 @@
+import os
+
+def read_fastq(input_file):
+    sequences = {}
+    with open(input_file, 'r') as file:
+        lines = file.readlines()
+    
+    for i in range(0, len(lines), 4):
+        header = lines[i].strip()
+        sequence = lines[i+1].strip()
+        plus = lines[i+2].strip()
+        quality = lines[i+3].strip()
+        
+        name = header[1:]
+        sequences[name] = (sequence, quality)
+    
+    return sequences
+
+def write_fastq(sequences_dict, output_file):
+    folder = os.path.dirname(output_file)
+    if folder and not os.path.exists(folder):
+        os.makedirs(folder)
+        
+    if os.path.exists(output_file):
+        raise FileExistsError(f"File {output_file} already exists. Will not overwrite.")
+    
+    with open(output_file, 'w') as file:
+        for name, (sequence, quality) in sequences_dict.items():
+            file.write(f"@{name}\n")
+            file.write(f"{sequence}\n")
+            file.write("+\n")
+            file.write(f"{quality}\n")
+
 def check_gc_content(seq: str) -> float:
     """
     Calculate GC content percentage of a sequence.
