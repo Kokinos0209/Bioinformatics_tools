@@ -1,84 +1,77 @@
 # Bioinformatics tools
 
+![alt text](image.png)
 
-A set of utilities for working with DNA/RNA sequences and FASTQ files.
+## Features
 
-## Functionality
+- Object-oriented API for biological sequences:
+	- DNASequence/RNASequence with complement, reverse and reverse-complement operations
+	- Transcription of DNA to RNA
+	- AminoAcidSequence with molecular weight calculation
+- FASTQ filtering by GC content, read length and average quality (using Biopython).
 
-**Main functions in `pybio_tools.py`:**
+## Installation
 
- `run_dna_rna_tools(*args)` function:
+Make sure you have Python 3 and Biopython installed:
 
-Performs operations on DNA/RNA sequences.
-
-**Supported Operations:**
-
-- `is_nucleic_acid` - validate sequence
-- `transcribe` - DNA to RNA transcription  
-- `reverse` - reverse sequence
-- `complement` - complementary sequence
-- `reverse_complement` - reverse complementary sequence
-
-**Usage Examples:**
-```python
-run_dna_rna_tools('TTUU', 'is_nucleic_acid') # False 
-run_dna_rna_tools('ATG', 'transcribe') # 'AUG'
-run_dna_rna_tools('ATG', 'reverse') # 'GTA'
-run_dna_rna_tools('AtG', 'complement') # 'TaC'
-run_dna_rna_tools('ATg', 'reverse_complement') # 'cAT'
-run_dna_rna_tools('ATG', 'aT', 'reverse') # ['GTA', 'Ta']
+```bash
+pip install biopython
 ```
 
+Clone the repository and move into the project directory:
 
-`filter_fastq(seqs, gc_bounds, length_bounds, quality_threshold) ` function:
+```bash
+git clone git@github.com:Kokinos0209/Bioinformatics_tools.git
+cd pybio-tools
+```
 
-Filters FASTQ sequences by various criteria.
+## Usage examples
 
-**Parameters:**
+### Working with DNA and RNA
 
-- `input_fastq - path to input FASTQ file`
-- `output_fastq - path for output FASTQ file (saved in 'filtered' folder)`
-- `gc_bounds - GC content bounds (default: (0, 100))`
-- `length_bounds - length bounds (default: (0, 2³²))`
-- `quality_threshold - average quality threshold (default: 0)`
+```python
+from pybio_tools import DNASequence, RNASequence
 
-**Usage Examples:**
-```Python
+seq_dna = DNASequence("ATGCGTAG")
+print(seq_dna)                 # ATGCGTAG
+seq_dna.check_alphabet()       # True
+
+seq_rna = seq_dna.transcribe() # DNA -> RNA
+print(seq_rna)                 # AUGCGUAG
+
+seq_dna_complement = seq_dna.complement() #TACGCATC
+seq_dna_reverse = seq_dna.reverse() #GATGCGTA
+seq_dna_rev_comp = seq_dna.reverse_complement() #CTACGCAT
+```
+P.S. always make check_alphabet for your seq!
+
+### Amino acid sequences
+
+```python
+from pybio_tools import AminoAcidSequence
+
+seq_AA = AminoAcidSequence("ACDEFGHIKLMNPQRSTVWY")
+seq_AA.check_alphabet()            # True
+seq_AA_weight = seq_AA.molecular_weight()
+print(f"{seq_AA_weight:.2f} g/mol") # 2738.02 g/mol   
+```
+P.S. always make check_alphabet for your seq!
+
+### FASTQ filtering
+
+```python
+from pybio_tools import filter_fastq
+
 filter_fastq(
-    input_fastq="example_fastq.fastq",
-    output_fastq="high_quality.fastq",
-    quality_threshold=20,
-    gc_bounds=(40, 60)
+		input_fastq="input.fastq",
+		output_fastq="filtered.fastq",
+		gc_bounds=(40, 60),        # GC% range
+		length_bounds=(50, 300),   # read length range
+		quality_threshold=20       # minimum average quality
 )
 ```
 
-## Installation and Usage
-
-~~~
-git clone git@github.com:Kokinos0209/Bioinformatics_tools.git
-cd pybio-tools
-~~~
-
-**Import functions**
-~~~python
-from pybio_tools import run_dna_rna_tools, filter_fastq
-~~~
-
-## Modules
-
-**Module seq_operations**
-contains functions for DNA/RNA sequence operations:
-- Sequence validation
-- Transcription
-- Complementary transformations
-- Sequence reversal
-
-**Module fastq_operations**
-contains functions for FASTQ data analysis:
-- GC content calculation
-- Bounds checking
-- Average quality calculation
-- Helper functions for filtering
+The function prints how many reads passed the filter and writes them to the output FASTQ file.
 
 ## Development
 This program was developed for educational purposes and can be extended with additional bioinformatics analysis functions.
