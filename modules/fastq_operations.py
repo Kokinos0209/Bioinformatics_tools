@@ -1,4 +1,51 @@
-def gc_content(seq: str) -> float:
+import os
+
+def read_fastq(input_file):
+    """
+    Read FASTQ file and return sequences dictionary.
+    
+    Args:
+        input_file: Path to FASTQ file
+        
+    Returns:
+        Dictionary with sequence names as keys and (sequence, quality) as values
+    """
+    sequences = {}
+    with open(input_file, 'r') as file:
+        lines = file.readlines()
+    
+    for i in range(0, len(lines), 4):
+        header = lines[i].strip()
+        sequence = lines[i+1].strip()
+        plus = lines[i+2].strip()
+        quality = lines[i+3].strip()
+        
+        name = header[1:]
+        sequences[name] = (sequence, quality)
+    
+    return sequences
+
+def write_fastq(sequences_dict, output_file):
+    """
+    Write sequences to FASTQ file in filtered folder.
+    
+    Args:
+        sequences_dict: Dictionary with sequence data
+        output_file: Output filename (saved in filtered folder)
+    """
+    folder = "filtered"
+    if not os.path.exists(folder):
+        os.makedirs(folder)
+    full_path = os.path.join(folder, output_file)
+    
+    with open(full_path, 'w') as file:
+        for name, (sequence, quality) in sequences_dict.items():
+            file.write(f"@{name}\n")
+            file.write(f"{sequence}\n")
+            file.write("+\n")
+            file.write(f"{quality}\n")
+
+def check_gc_content(seq: str) -> float:
     """
     Calculate GC content percentage of a sequence.
 
@@ -8,12 +55,13 @@ def gc_content(seq: str) -> float:
     Returns:
         GC content as percentage (0-100)
     """
-    gc_count = seq.count("G") + seq.count("C")
-    total_length = len(seq)
+    seq_upper = seq.upper()
+    gc_count = seq_upper.count("G") + seq_upper.count("C")
+    total_length = len(seq_upper)
     return (gc_count / total_length) * 100
 
 
-def check_bounds(lenght: int, bounds: int | tuple[float, float]) -> bool:
+def check_bounds(value: int, bounds: int | tuple[float, float]) -> bool:
     """
     Check if value is within specified bounds.
 
@@ -25,17 +73,11 @@ def check_bounds(lenght: int, bounds: int | tuple[float, float]) -> bool:
         True if value is within bounds, False otherwise
     """
     if type(bounds) == int:
-        if lenght < bounds:
-            return True
-        else:
-            return False
+         return value < bounds
     else:
-        min_lenght = bounds[0]
-        max_lenght = bounds[1]
-        if min_lenght <= lenght <= max_lenght:
-            return True
-        else:
-            return False
+        min_value = bounds[0]
+        max_value = bounds[1]
+        return min_value <= value <= max_value
 
 
 def average_quality(q_string: str) -> float:

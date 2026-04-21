@@ -1,7 +1,6 @@
 from modules import seq_operations, fastq_operations
 
-
-def run_dna_rna_tools(*args):
+def run_dna_rna_tools(*args: str) -> any:
     """
     Perform DNA/RNA sequence operations
 
@@ -32,12 +31,15 @@ def run_dna_rna_tools(*args):
                     results.append(seq_operations.complement(seq))
                 elif operation == "reverse_complement":
                     results.append(seq_operations.reverse_complement(seq))
-
-    return results
+    if len(results) == 1:
+        return results[0]
+    else:
+        return results
 
 
 def filter_fastq(
-    seqs: dict[str, tuple[str, str]],
+    input_fastq: str,
+    output_fastq: str,
     gc_bounds: tuple[float, float] | float = (0, 100),
     length_bounds: tuple[int, int] | int = (0, 2**32),
     quality_threshold: float = 0,
@@ -46,7 +48,8 @@ def filter_fastq(
     Filters FASTQ sequences by GC content, length, and quality
 
     Args:
-    seqs (dict): A dictionary {sequence_name: (sequence, quality)}
+    input_fastq (str): Path to input FASTQ file
+    output_fastq (str): Path to output FASTQ file 
     gc_bounds: GC content bounds (default (0, 100))
     length_bounds: Length bounds (default (0, 2**32))
     quality_threshold: Average quality threshold (default 0)
@@ -54,13 +57,15 @@ def filter_fastq(
     Returns:
     dict: Filtered dictionary of sequences
     """
+    sequences = fastq_operations.read_fastq(input_fastq)
+
     result = {}
-    for name in seqs:
-        sequence_data = seqs[name]
+    for name in sequences:
+        sequence_data = sequences[name]
         sequence = sequence_data[0]
         quality = sequence_data[1]
 
-        gc_percent = fastq_operations.gc_content(sequence)
+        gc_percent = fastq_operations.check_gc_content(sequence)
         gc_opt = fastq_operations.check_bounds(gc_percent, gc_bounds)
         if not gc_opt:
             continue
@@ -76,4 +81,7 @@ def filter_fastq(
 
         result[name] = (sequence, quality)
 
+    fastq_operations.write_fastq(result, output_fastq)
+
     return result
+
