@@ -1,2 +1,3 @@
-python3
-biopython
+python3 3.11.14
+biopython 1.86 
+pytest 9.0.3
