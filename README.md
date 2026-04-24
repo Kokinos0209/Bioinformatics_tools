@@ -70,6 +70,11 @@ filter_fastq(
 		quality_threshold=20       # minimum average quality
 )
 ```
+OR using terminal
+
+```bash
+python pybio_tools.py -i input.fastq -o output.fastq -gc <your_value> -l <your_value> -q <your_value>
+```
 
 The function prints how many reads passed the filter and writes them to the output FASTQ file.
 

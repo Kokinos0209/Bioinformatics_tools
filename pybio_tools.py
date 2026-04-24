@@ -147,6 +147,17 @@ class AminoAcidSequence(BiologicalSequence):
 
 from Bio import SeqIO
 from Bio.SeqUtils import gc_fraction
+import logging
+
+logging.basicConfig(
+    filename="filter_fastq.log",
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    encoding="utf-8"
+)
+
+logger = logging.getLogger(__name__)
+
 
 def filter_fastq(input_fastq: str,
                  output_fastq: str,
@@ -162,7 +173,7 @@ def filter_fastq(input_fastq: str,
     quality_threshold: Average quality threshold (default 0)
 
     Returns:
-    dict: Filtered dictionary of sequences"""
+    File with filtered sequences"""
 
     if isinstance(gc_bounds, (int, float)):
         gc_min, gc_max = 0.0, float(gc_bounds)
@@ -177,23 +188,68 @@ def filter_fastq(input_fastq: str,
     filtered_records = []
     total_records = 0
 
-    for record in SeqIO.parse(input_fastq, "fastq"):
-        total_records += 1
-        gc_percent = gc_fraction(record.seq) * 100
-        if not (gc_min <= gc_percent <= gc_max):
-            continue
+    logger.info(
+        "Starting FASTQ filtering: input=%s, output=%s, gc_bounds=%s, length_bounds=%s, quality_threshold=%s",
+        input_fastq, output_fastq, gc_bounds, length_bounds, quality_threshold
+    )
+    try:
 
-        seq_len = len(record.seq)
-        if not (len_min <= seq_len <= len_max):
-            continue
+        for record in SeqIO.parse(input_fastq, "fastq"):
+            total_records += 1
 
-        qualities = record.letter_annotations["phred_quality"]
-        avg_quality = sum(qualities) / len(qualities)
-        if avg_quality < quality_threshold:
-            continue
-        filtered_records.append(record)
+            gc_percent = gc_fraction(record.seq) * 100
+            if not (gc_min <= gc_percent <= gc_max):
+                continue
 
-    print(f"Passed filter: {len(filtered_records)} reads out of {total_records}")
+            seq_len = len(record.seq)
+            if not (len_min <= seq_len <= len_max):
+                continue
 
-    SeqIO.write(filtered_records, output_fastq, "fastq")
+            qualities = record.letter_annotations["phred_quality"]
+            avg_quality = sum(qualities) / len(qualities)
+            if avg_quality < quality_threshold:
+                continue
+
+            filtered_records.append(record)
+
+        SeqIO.write(filtered_records, output_fastq, "fastq")
+
+        logger.info(
+            "Filtering completed successfully: passed=%s, total=%s",
+            len(filtered_records), total_records
+        )
+
+        print(f"Passed filter: {len(filtered_records)} reads out of {total_records}")
+
+    except FileNotFoundError:
+        logger.error("Input file not found: %s", input_fastq)
+        print(f"Error: input file not found: {input_fastq}")
+        raise
+
+    except Exception as error:
+        logger.error("Unexpected error during FASTQ filtering: %s", error)
+        print(f"Unexpected error: {error}")
+    
+
+
+import argparse
+
+parser = argparse.ArgumentParser(description="Filters FASTQ sequences by GC content, read length, and quality")
+parser.add_argument("-i","--input-fastq", required=True, help="Path to input FASTQ file")
+parser.add_argument("-o","--output-fastq", required=True, help="Path to output FASTQ file")
+parser.add_argument("-gc","--gc-bounds", type=float, nargs=2, default=(0, 100), help="GC content bounds (default (0, 100))")
+parser.add_argument("-l","--length-bounds", type=int, nargs=2, default=(0, 2**32), help="Length bounds (default (0, 2**32))")
+parser.add_argument("-q","--quality-threshold", type=float, default=0, help="Average quality threshold (default 0)")
+
+if __name__ == '__main__':
+    args = parser.parse_args()
+    filter_fastq(
+        input_fastq=args.input_fastq,
+        output_fastq=args.output_fastq,
+        gc_bounds=tuple(args.gc_bounds),
+        length_bounds=tuple(args.length_bounds),
+        quality_threshold=args.quality_threshold
+    )
+
+
 
